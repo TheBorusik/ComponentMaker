@@ -1,2 +1,0 @@
-# ComponentMaker
-Created with CodeSandbox

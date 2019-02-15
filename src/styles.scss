@@ -1,0 +1,294 @@
+*,
+*:before,
+*:after {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+@function fill($direction, $color, $span, $offset: 0px, $opacity: 1) {
+	@return linear-gradient(to $direction, transparent 0 $offset, rgba($color, $opacity) $offset $span, transparent calc(#{$offset} + #{$span}) 100%);
+}
+
+$scale: 1;
+
+$col: 1vw * $scale;
+$row: 1vh * $scale;
+
+$font-size: 1.2vh;
+$line-height: 2 * $font-size;
+
+$line-font-size: $font-size / 2;
+$line: 1px;
+
+$col-count: ceil(24 / $scale);
+$row-count: ceil(24 / $scale);
+
+$root-color: #1d1e22;
+$back-color: #36383f;
+$text-color: #c5c8d4;
+$line-color: red;
+$gap-color: yellow;
+$line-color: #d44545;
+$gap-color: #ffdd40;
+
+$switch-border: 0px inset #c5c8d4;
+
+$line-color-opacity: 0;
+$gap-color-opacity: 0;
+
+$line-color-opacity: rgba($line-color, $line-color-opacity);
+$gap-color-opacity: rgba($gap-color, $gap-color-opacity);
+
+$grid-lines-color: black;
+
+$transition-ms: 0.1s;
+$transition-func: cubic-bezier(calc(0 + #{$transition-ms}), 1, 0, 1);
+// $title-color: black;
+// $root-color: lighten($root-color, 80%);
+// $back-color: lighten($back-color, 80%);
+// $text-color: darken($text-color, 80%);
+
+$root-color: #1c2022;
+$text-color: #24282a;
+//$back-color: #404446;
+// $text-color: white;
+
+// $root-color: white;
+$back-color: #f5f5f5;
+// $text-color: rgba(0, 0, 0, 0.65);
+$title-color: transparent;
+
+// $back-color:rgba(197, 200, 212, 0.5);
+
+@function line($line-color, $top: 0, $right: 0, $bottom: 0, $left: 0, $offset: 0) {
+	@return linear-gradient(to top, transparent 0 $offset, $line-color $offset $offset + $bottom, transparent $offset + $bottom 100%),
+		linear-gradient(to right, transparent 0 $offset, $line-color $offset $offset + $left, transparent $offset + $left 100%),
+		linear-gradient(to bottom, transparent 0 $offset, $line-color $offset $offset + $top, transparent $offset + $top 100%),
+		linear-gradient(to left, transparent 0 $offset, $line-color $offset $offset + $right, transparent $offset + $right 100%);
+}
+
+.app {
+	width: 100vw;
+	height: 100vh;
+	background: $root-color;
+	align-items: center;
+	justify-items: center;
+	display: grid;
+	grid-template-columns: auto auto auto;
+	grid-template-rows: auto 100vh auto;
+}
+
+@mixin field($name, $data: ()) {
+	$field: map-merge($field-default-data, $data);
+	.field.#{$name} {
+		grid-area: $name;
+		order: map-get($field, order);
+		grid-column: map-get($field, col);
+		grid-row: map-get($field, row);
+	}
+}
+
+.field {
+	// border-left: $line solid rgba($text-color, 0.5);
+	// border-top: $line solid rgba($text-color, 0.5);
+	border-bottom: 0;
+	display: grid;
+	grid-template-columns: max-content 1fr;
+	line-height: $line-height;
+	font-size: $font-size;
+
+	input {
+		background: $back-color;
+		grid-column: 2;
+		line-height: $line-height;
+		font-size: $font-size;
+		// background: transparentize(lightgray, 0.9);
+		color: $text-color;
+		border: 0;
+		outline: none;
+		padding: 0 $col;
+		border-bottom: 1px solid transparent;
+		transition: transform 0.1s ease-in-out;
+		&:hover {
+			// background: transparentize(lightgray, 0.7);
+		}
+		&:focus {
+			border-bottom: 1px solid orange;
+			caret-color: orange;
+		}
+	}
+
+	label {
+		min-width: 96px;
+		grid-column: 1;
+		padding-left: 12px;
+		padding-right: 12px;
+		// min-width: 140px;
+		color: $back-color;
+		background: $text-color;
+		line-height: $line-height;
+		font-size: $font-size;
+		text-align: left;
+		// border-right: $line solid rgba($text-color, 0.5);
+	}
+}
+
+.bank-bic,
+.bank-bic-rus {
+	label {
+		min-width: 48px;
+	}
+}
+
+div[class$='country-code'] {
+	label {
+		min-width: 48px;
+	}
+	input {
+		max-width: 80px;
+		text-align: center;
+	}
+}
+
+@mixin title($value) {
+	align-self: center;
+	.title {
+		grid-column: span 24;
+		grid-row: span 1;
+		// padding-left: $col;
+		padding-left: 10px;
+		position: relative;
+		line-height: $line-height;
+		font-size: $font-size;
+		// background: transparentize($back-color, 0.6);
+		// background: linear-gradient(to right, $root-color, lighten($root-color, 10%), $root-color);
+		color: white;
+		// background: green;
+		// border-top: $line solid rgba($text-color, 0.5);
+		&::after {
+			content: $value;
+			color: $title-color;
+			font-weight: 600;
+		}
+	}
+}
+
+$max-width: 800px;
+
+$field-default-data: (
+	col: col-start,
+	row: span 1
+);
+
+$year: '[jan] 1fr [jan feb] 1fr [feb mar] 1fr [mar apr] 1fr [apr may] 1fr [may jun] 1fr [jun jul] 1fr [jul aug] 1fr [aug sep] 1fr [sep oct] 1fr [oct nov] 1fr [nov dec] 1fr [dec]';
+$max-width: 768;
+
+.form {
+	align-self: start;
+	grid-column: 2;
+	grid-row: 2;
+	// max-width: $max-width * 1px;
+	// min-width: $max-width * 1px;
+	color: $text-color;
+
+	& .group {
+		display: grid;
+		// --cols: calc((100vw - (100vw - #{$max-width})) / 12);
+		grid-template-columns: unquote($string: 'repeat(24, [col] minmax(max-content,1fr)) [col]');
+		// grid-auto-flow: column dense;
+
+		&.info {
+			//----------------------------------------------------------
+			@include title('Валютное  поручение');
+			//----------------------------------------------------------s
+			@include field(documentNumber, $data: (col: span 8, row: 2));
+			@include field(paymentDate, $data: (col: span 8, row: 2));
+			@include field(paymentSpeed, $data: (col: span 8, row: 2));
+		}
+		&.payer {
+			//----------------------------------------------------------
+			@include title('Переводадатель');
+			//----------------------------------------------------------
+			@include field(payerName, $data: (col: span 24));
+			@include field(payerAcc, $data: (col: span 12));
+			@include field(payerInn, $data: (col: span 12, row: 4));
+			@include field(amount, $data: (col: span 12));
+			@include field(payment-currency, $data: (col: span 6));
+			@include field(payment-rate, $data: (col: span 6));
+			@include field(payer-city, $data: (col: span 8, row: 5));
+			@include field(payer-country-code, $data: (col: span 4, row: 5));
+			@include field(payer-country, $data: (col: span 12));
+			@include field(payer-address, $data: (col: span 24));
+			@include field(payer-employee-fio, $data: (col: span 12));
+			@include field(payer-employee-fio-phones, $data: (col: span 12));
+		}
+		&.payer-bank {
+			//----------------------------------------------------------
+			@include title('Банк переводадателя');
+			//----------------------------------------------------------
+			@include field(bank-name, $data: (col: span 24, row: 2));
+			@include field(bic-type, $data: (col: span 8, row: 3));
+			@include field(bank-bic, $data: (col: span 8, row: 3));
+			@include field(bank-bic-rus, $data: (col: span 8, row: 3));
+			@include field(bank-city, $data: (col: span 8, row: 4));
+			@include field(bank-country-code, $data: (col: span 4, row: 4));
+			@include field(bank-country, $data: (col: span 12, row: 4));
+			@include field(bank-address, $data: (col: span 24));
+		}
+		&.intermed-bank {
+			@include title('Банк посредника');
+			//----------------------------------------------------------
+			@include field(bank-name, $data: (col: span 24, row: 2));
+			@include field(bic-type, $data: (col: span 8, row: 3));
+			@include field(bank-bic, $data: (col: span 8, row: 3));
+			@include field(bank-bic-rus, $data: (col: span 8, row: 3));
+			@include field(bank-city, $data: (col: span 8, row: 4));
+			@include field(bank-country-code, $data: (col: span 4, row: 4));
+			@include field(bank-country, $data: (col: span 12, row: 4));
+			@include field(bank-address, $data: (col: span 24));
+		}
+		&.payee-bank {
+			//----------------------------------------------------------
+			@include title('Банк бенефициара');
+			//----------------------------------------------------------
+			@include field(bank-name, $data: (col: span 24, row: 2));
+			@include field(bic-type, $data: (col: span 8, row: 3));
+			@include field(bank-bic, $data: (col: span 8, row: 3));
+			@include field(bank-bic-rus, $data: (col: span 8, row: 3));
+			@include field(bank-city, $data: (col: span 8, row: 4));
+			@include field(bank-country-code, $data: (col: span 4, row: 4));
+			@include field(bank-country, $data: (col: span 12, row: 4));
+			@include field(bank-address, $data: (col: span 24));
+		}
+		&.payee {
+			//----------------------------------------------------------
+			@include title('Бенефициар');
+			//----------------------------------------------------------
+			@include field(payee-name, $data: (col: span 24));
+			@include field(payee-acc, $data: (col: span 24));
+			@include field(payee-city, $data: (col: span 8, row: 4));
+			@include field(payee-country-code, $data: (col: span 4));
+			@include field(payee-country, $data: (col: span 12));
+			@include field(payee-address, $data: (col: span 24));
+		}
+		&.commission {
+			//----------------------------------------------------------
+			@include title('Информация платежа');
+			//----------------------------------------------------------
+			@include field(commission-type, $data: (col: span 12));
+			@include field(commission-from, $data: (col: span 12));
+			@include field(purpose-text, $data: (col: span 12));
+			@include field(addinfo-text, $data: (col: span 12));
+		}
+		&.control-info {
+			//----------------------------------------------------------
+			@include title('Информация для валютного контроля');
+			//----------------------------------------------------------
+			@include field(control-info-contract, $data: (col: span 12));
+			@include field(control-info-passport, $data: (col: span 12));
+			@include field(control-info-declaration, $data: (col: span 12));
+			@include field(control-addinfo-text, $data: (col: span 12));
+		}
+	}
+}

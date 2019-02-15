@@ -1,0 +1,408 @@
+@import 'mixin';
+
+:root {
+	--show-lines: brown;
+}
+*,
+*:before,
+*:after {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+$scale: 1;
+
+$col: 32px * $scale;
+$row: 32px * $scale;
+
+$font-size: 1rem;
+$line-height: 1.5 * $font-size;
+$line-font-size: $font-size / 2;
+
+$line: 1px;
+
+$col-count: ceil(24 / $scale);
+$row-count: ceil(24 / $scale);
+
+$root-color: #1d1e22;
+$back-color: #36383f;
+$text-color: #c5c8d4;
+$line-color: red;
+$gap-color: yellow;
+$line-color: #d44545;
+$gap-color: #ffdd40;
+
+$switch-border: 0px inset #c5c8d4;
+
+$line-color-opacity: 0;
+$gap-color-opacity: 0;
+
+$line-color-opacity: rgba($line-color, $line-color-opacity);
+$gap-color-opacity: rgba($gap-color, $gap-color-opacity);
+
+$grid-lines-color: black;
+
+$transition-ms: 0.1s;
+$transition-func: cubic-bezier(calc(0 + #{$transition-ms}), 1, 0, 1);
+$title-color: white;
+// $root-color:lighten($root-color,80%);
+// $back-color:lighten($back-color,80%);
+// $text-color:darken($text-color,80%);
+// $root-color:white;
+// $back-color:#f5f5f5;
+// $text-color:rgba(0,0,0,.65);
+// $title-color:black;
+
+%stretch {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+%grid-lines {
+	@extend %stretch;
+	opacity: 0.1;
+	background-blend-mode: difference;
+	background-position: 0px 0px;
+	background-size: 2 * $col 2 * $row;
+	background-repeat: repeat;
+	background-image: fill(right, $text-color, $line), fill(bottom, $text-color, $line);
+}
+
+%layout-shared {
+	@extend %grid-lines;
+	content: '';
+	position: absolute;
+	pointer-events: none;
+}
+
+html {
+	line-height: 1.15vh;
+}
+
+$pt: 1rem;
+$unit: 2 * $pt;
+
+$top: 2 * $unit;
+$left: 8 * $unit;
+$center: 1fr;
+$right: 2 * $unit;
+$bottom: 2 * $unit;
+
+//=====================================================
+.layout__container {
+	//---------------------------------------------------
+	position: relative;
+	height: 100vh;
+	//---------------------------------------------------
+	background: $root-color;
+	//---------------------------------------------------
+	display: grid;
+	grid-template:
+		'top-left top-center top-right' #{$top}
+		'center-left center-center center-right' #{$center}
+		'bottom-left bottom-center bottom-right' #{$bottom}
+		/ #{$left} #{$center} #{$right};
+
+	.layout__content {
+		//---------------------------------------------------
+		display: grid;
+		grid-area: center-center;
+		background: green;
+	}
+	//=====================================================
+	.layout-gridlines {
+		@extend %layout-shared;
+		//---------------------------------------------------
+		grid-area: center-center;
+		//---------------------------------------------------
+		&.hide {
+			display: none;
+		}
+	}
+
+	.layout__columns {
+		grid-area: top-center;
+		//---------------------------------------------------
+		background-position: 0 $row;
+		background-image: fill(bottom, $back-color, $row);
+		//---------------------------------------------------
+		display: grid;
+		grid-template-rows: repeat(2, $row);
+		grid-auto-columns: repeat(24, 1fr);
+	}
+
+	.layout__rows {
+		grid-area: center-left;
+		justify-self: end;
+		//---------------------------------------------------
+		background-position: $col 0;
+		background-image: fill(right, $back-color, $col);
+		//---------------------------------------------------
+		display: grid;
+		grid-template-columns: repeat(2, $col);
+		grid-auto-rows: 1fr;
+	}
+	//=====================================================
+	.layout__menu--left {
+		//---------------------------------------------------
+		display: grid;
+		grid-area: top-left;
+		//=====================================================
+		span {
+			grid-column: 8;
+			place-self: center;
+
+			width: $row;
+			height: $row;
+			background: $back-color;
+			:hover {
+				box-shadow: 0px 0px 10px 0px lighten($color: $back-color, $amount: 40);
+			}
+		}
+		//=====================================================
+		& .switch.display-layout {
+			position: relative;
+			color: $text-color;
+			background-position: 0px 0px;
+			background-repeat: repeat;
+			background-size: $row $row;
+			background-image: fill(bottom, $text-color, $line, 0.5 * $row),
+				fill(left, $text-color, $line, 0.5 * $row);
+
+			&.hide {
+				background-image: 100% 100%;
+				background: fill(bottom, $text-color, $line), fill(top, $text-color, $line),
+					fill(right, $text-color, $line), fill(left, $text-color, $line);
+				box-shadow: 0;
+			}
+		}
+	}
+	.layout__menu--right {
+		// background: $back-color;
+		grid-area: top-right;
+	}
+}
+
+@for $i from $col-count - 1 through 99 {
+	.layout-cols {
+		& .line:nth-child(#{$i}),
+		& .gap:nth-child(#{$i}) {
+			display: none;
+			&::before,
+			&::after {
+				width: 0;
+				height: 0;
+			}
+		}
+	}
+}
+@for $i from $row-count - 1 through 99 {
+	.layout-rows {
+		& .line:nth-child(#{$i}),
+		& .gap:nth-child(#{$i}) {
+			display: none;
+			width: 0;
+			height: 0;
+			&::before,
+			&::after {
+				width: 0;
+				height: 0;
+			}
+		}
+	}
+}
+
+.layout-rows {
+	//---------------------------------------------------
+
+	justify-self: center;
+
+	& .line {
+		grid-column: 1;
+		font-size: $line-font-size;
+		line-height: $row;
+		color: $text-color;
+		counter-increment: line-number;
+		counter-reset: section;
+		position: relative;
+		text-align: center;
+
+		&::before,
+		&::after {
+			@extend %stretch;
+		}
+
+		&::before {
+			content: '';
+			height: $row;
+			width: $col-count * $col - $col;
+			background-position: $col 0;
+			background-size: $col-count * $col - $col $row;
+			background-repeat: no-repeat;
+			transition: background-position 0.2s ease-in-out;
+		}
+		&:hover::before,
+		&.active::before {
+			background-image: fill(bottom, $line-color, $line), fill(right, $line-color, $col);
+			z-index: 1;
+		}
+		&.active::before,
+		&:hover::after,
+		&.active::after {
+			background-position: 0 0;
+			z-index: 1;
+			color: white;
+			font-weight: 700;
+		}
+
+		&::after {
+			content: counter(line-number);
+			width: 2 * $col;
+			padding-right: $col;
+		}
+	}
+
+	& .gap {
+		grid-column: 1;
+		font-size: $line-font-size;
+		line-height: $row;
+		color: $text-color;
+		position: relative;
+		text-align: center;
+		counter-increment: line-number;
+		counter-reset: section;
+		width: $col;
+		height: $row;
+
+		&::before,
+		&::after {
+			@extend %stretch;
+		}
+
+		&::before {
+			content: '';
+			height: $row;
+			width: $col-count * $col - $col;
+			background-position: $col 0;
+			background-size: $col-count * $col - $col $row;
+			background-repeat: no-repeat;
+			transition: background-position 0.2s ease-in-out;
+			pointer-events: none;
+		}
+		&:hover::before,
+		&.active::before {
+			background-image: fill(bottom, $gap-color, $line), fill(right, $gap-color, $col);
+			z-index: 1;
+		}
+		&.active::before,
+		&:hover::after,
+		&.active::after {
+			background-position: 0 0;
+			z-index: 1;
+			color: white;
+			font-weight: 700;
+		}
+
+		&::after {
+			content: counter(line-number);
+			width: 2 * $col;
+			padding-right: $col;
+		}
+	}
+}
+
+.layout-cols {
+	//---------------------------------------------------
+	& .line {
+		grid-row: 1;
+		font-size: $line-font-size;
+		line-height: $row;
+		color: $text-color;
+		counter-increment: line-number;
+		counter-reset: section;
+		position: relative;
+		text-align: center;
+		height: $row;
+		width: $col;
+
+		&::before,
+		&::after {
+			@extend %stretch;
+		}
+
+		&::before {
+			content: '';
+			height: $row-count * $row - $row;
+			background-position: 0 $row;
+			background-size: $col $row-count * $row - $row;
+			background-repeat: no-repeat;
+			transition: background-position 0.2s ease-in-out;
+		}
+		&:hover::before,
+		&.active::before {
+			background-image: fill(right, $line-color, $line), fill(bottom, $line-color, $row);
+			z-index: 1;
+		}
+		&.active::before,
+		&:hover::after,
+		&.active::after {
+			background-position: 0 0;
+			z-index: 1;
+			color: white;
+			font-weight: 700;
+		}
+
+		&::after {
+			content: counter(line-number);
+		}
+	}
+
+	& .gap {
+		grid-row: 1;
+		font-size: $line-font-size;
+		line-height: $row;
+		color: $text-color;
+		position: relative;
+		text-align: center;
+		counter-increment: line-number;
+		counter-reset: section;
+		width: $col;
+		height: $row;
+
+		&::before,
+		&::after {
+			@extend %stretch;
+		}
+
+		&::before {
+			content: '';
+			height: $row-count * $row - $row;
+			width: $col;
+			background-position: 0 $row;
+			background-size: $col $row-count * $row - $row;
+			background-repeat: no-repeat;
+			transition: background-position 0.2s ease-in-out;
+		}
+		&:hover::before,
+		&.active::before {
+			background-image: fill(right, $gap-color, $line), fill(bottom, $gap-color, $row);
+			z-index: 1;
+		}
+		&.active::before,
+		&:hover::after,
+		&.active::after {
+			background-position: 0 0;
+			z-index: 1;
+			color: white;
+			font-weight: 700;
+		}
+
+		&::after {
+			content: counter(line-number);
+		}
+	}
+}

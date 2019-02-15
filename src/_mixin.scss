@@ -1,0 +1,152 @@
+// dDEFAULT
+
+@mixin shared(
+	$w: null,
+	$wmin: null,
+	$wmax: null,
+	$h: null,
+	$hmin: null,
+	$hmax: null,
+	$pos: null,
+	$t: null,
+	$l: null,
+	$b: null,
+	$r: null,
+	$bt: null,
+	$bl: null,
+	$br: null,
+	$bb: null,
+	$lh: null,
+	$fs: null,
+	$ol: null
+) {
+	//WIDTH
+	width: $w;
+	min-width: $wmin;
+	max-width: $wmax;
+	//HEIGHT
+	height: $h;
+	min-height: $hmin;
+	max-height: $hmax;
+	//PADDING
+	padding: 0 4px;
+	//POSITION
+	position: $pos;
+	top: $t;
+	left: $l;
+	bottom: $b;
+	right: $r;
+	//BORDER
+	border: 0;
+	border-top: $bt;
+	border-left: $bl;
+	border-right: $br;
+	border-bottom: $bb;
+	//FONT
+	line-height: $lh;
+	font-size: $fs;
+
+	color: $text-color;
+	outline: 0;
+	@content;
+}
+
+// SIZE
+@mixin width($w: null, $min: null, $max: null) {
+	width: $w;
+	min-width: $min;
+	max-width: $max;
+	@content;
+}
+
+@mixin height($h: null, $min: null, $max: null) {
+	@content;
+}
+
+@mixin size($w, $h) {
+	@include width($w);
+	@include height($h);
+	@content;
+}
+
+//POSITION
+$position-default: (
+	position: null,
+	top: null,
+	left: null,
+	bottom: null,
+	right: null
+);
+
+@mixin position(
+	$position: relative,
+	$top: null,
+	$left: null,
+	$bottom: null,
+	$right: null
+) {
+	position: $position;
+	top: $top;
+	left: $left;
+	bottom: $bottom;
+	right: $right;
+	@content;
+}
+// BORDER
+$border-default: (
+	width: 1px,
+	color: black,
+	style: solid
+);
+
+@mixin border-top($top: 1px solid black, $reset: 0) {
+	border: $reset;
+	border-top: $top;
+	@content;
+}
+@mixin border-right($right: 1px solid black, $reset: 0) {
+	border: $reset;
+	border-right: $right;
+	@content;
+}
+@mixin border-bottom($bottom: 1px solid black, $reset: 0) {
+	border: $reset;
+	border-bottom: $bottom;
+	@content;
+}
+@mixin border-left($left: 1px solid black, $reset: 0) {
+	border: $reset;
+	border-left: $left;
+	@content;
+}
+@mixin border($all: 1px solid black, $reset: 0) {
+	border: 0;
+	border-top: $all;
+	border-left: $all;
+	border-right: $all;
+	border-bottom: $all;
+}
+
+//BACKGROUND
+
+@function fill($direction, $color, $span, $offset: 0px, $opacity: 1) {
+	@return linear-gradient(
+		to $direction,
+		transparent 0 $offset,
+		rgba($color, $opacity) $offset $span,
+		transparent calc(#{$offset} + #{$span}) 100%
+	);
+}
+
+//GRID
+
+@mixin column($start: auto, $end: auto) {
+	grid-column-start: $start;
+	grid-column-end: $end;
+	@content;
+}
+@mixin row($start: auto, $end: auto) {
+	grid-row-start: $start;
+	grid-row-end: $end;
+	@content;
+}
